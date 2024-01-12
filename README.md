@@ -48,6 +48,6 @@ npm run list-manual-downloads F:\Wabbajack\3.4.1.0\downloaded_mod_lists\some_@@_
 ```
 or
 ```
-wj-list-manual-downloads F:\Wabbajack\3.4.1.0\downloaded_mod_lists\some_@@_mod_list.wabbajack G:\WJ.Skyrim
+npm run list-manual-downloads F:\Wabbajack\3.4.1.0\downloaded_mod_lists\some_@@_mod_list.wabbajack G:\WJ.Skyrim
 ```
 (see [Standalone](#standalone-version) for parameters explanation)
