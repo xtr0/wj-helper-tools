@@ -1,0 +1,17 @@
+{
+  "name": "wj-helper-tools",
+  "version": "1.0.0",
+  "description": "",
+  "author": "https://github.com/xtr0",
+  "license": "MIT",
+  "scripts": {
+    "list-manual-downloads": "node src/wj-list-manual-downloads",
+    "build-list-manual-downloads": "call build.bat wj-list-manual-downloads"
+  },
+  "dependencies": {
+    "node-stream-zip": "^1.15.0"
+  },
+  "devDependencies": {
+    "browserify": "^17.0.0"
+  }
+}
