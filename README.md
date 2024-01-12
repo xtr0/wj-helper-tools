@@ -11,7 +11,7 @@ Generate a list of files for manual downloads based on a wabbajack file and (opt
 
 Output format is `<file name>\t<url>`
 
-_**NOTE:**_ Only file names are used to detect missing files => if file was changed but filename are the same it will be considered as already downloaded
+_**NOTE:**_ Only file names are used to detect missing files => if file was changed but filename is the same it will be considered as already downloaded
 
 ### Usage
 #### Standalone version
