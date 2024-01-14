@@ -1,24 +1,33 @@
-if (process.argv.length < 3 || process.argv.length > 4) {
-  console.error(`Usage: ${process.argv[1]} <wabbajack file> [download dir]`);
-  
-  return;
-}
-
-const fsP = require('fs').promises;
+const { promises: fsP } = require('fs');
 const path = require('path');
-const StreamZip = require('node-stream-zip');
+const commander = require('commander');
+
+const loadModlist = require('./common/loadModlist');
+const logger = require('./common/logger');
+
+const programFilename = path.basename(process.argv[1]);
+
+commander
+  .program
+  .name(programFilename)
+  .showHelpAfterError()
+  .option('-d, --download <download>', 'Path to Wabbajack download directory')
+  .requiredOption('-l, --list <list>', 'Wabbajack modlist - full path to .wabbajack file')
+
+commander.program.parse();
 
 const manualDownloadMarkers = ['directurl=', 'manualurl='];
 
 async function main() {
-  const downloadPath = process.argv[3];
-  console.log('Download path:', downloadPath || 'not specified. All external files will be listed');
+  const downloadPath = commander.program.opts().download;
+  const listAllFiles = !downloadPath;
+  logger.info(`Download path: ${downloadPath || 'not specified. All external files will be listed'}`);
   
-  const modlistFilePath = process.argv[2];
-  console.log('Loading modlist:', modlistFilePath);
+  const modlistFilePath = commander.program.opts().list;
+  logger.info(`Loading modlist: ${modlistFilePath}`);
   const modlist = await loadModlist(modlistFilePath);
 
-  console.log('Generating file list...');
+  logger.info('Generating file list...');
   const manualDownloadArchives = modlist.Archives
     .filter(a => manualDownloadMarkers.some(m => a.Meta.toLowerCase().includes(m)))
     .reduce((af, a) => { af[a.Name.trim()] = a.Meta; return af; }, {});
@@ -37,12 +46,12 @@ async function main() {
   }
   
   if (!lines.length) {
-    console.log('No files to download found');
+    logger.info('No files to download found');
     return;
   }
   
-  const csvFilename = path.basename(modlistFilePath) + '.csv';
-  console.log('Writing file list:', csvFilename);
+  const csvFilename = `${path.basename(modlistFilePath)}_${listAllFiles ? 'all' : 'new'}.csv`;
+  logger.info(`Writing file list: ${csvFilename}`);
 
   await fsP.writeFile(csvFilename, lines.join(`\n`));
 }
@@ -61,13 +70,6 @@ function getUrlFromMetaIfPossible(meta) {
   }
 }
 
-async function loadModlist(wabbajackFilePath) {
-  const wabbajackZip = new StreamZip.async({ file: wabbajackFilePath });
-  const modlistData = await wabbajackZip.entryData('modlist');
-
-  await wabbajackZip.close();
-
-  return JSON.parse(modlistData.toString('utf8'));
-}
-
-main().catch(console.error);
+main()
+  .catch(e => logger.error(e.stack || e))
+  .finally(() => logger.end());
